@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Control de Boletos - Carne Asada</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-utensils"></i>
+                    <h1>Control de Boletos</h1>
+                    <span class="subtitle">Carne Asada</span>
+                </div>
+                <div class="header-stats">
+                    <div class="stat-item">
+                        <span class="stat-number" id="total-boletos">0</span>
+                        <span class="stat-label">Boletos Activos</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number" id="total-vueltas">0</span>
+                        <span class="stat-label">Vueltas Restantes</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            
+            <!-- Scanner Section -->
+            <section class="scanner-section card">
+                <div class="section-header">
+                    <h2><i class="fas fa-qrcode"></i> Escanear Boleto</h2>
+                    <div class="scanner-controls">
+                        <button id="toggle-camera" class="btn btn-secondary">
+                            <i class="fas fa-camera"></i> Activar Cámara
+                        </button>
+                        <button id="manual-input" class="btn btn-outline">
+                            <i class="fas fa-keyboard"></i> Entrada Manual
+                        </button>
+                    </div>
+                </div>
+
+                <div class="scanner-content">
+                    <!-- USB Scanner Input -->
+                    <div class="input-group">
+                        <input type="text" id="barcode-input" placeholder="Escanee el código de barras o ingrese manualmente..." 
+                               class="barcode-input" autocomplete="off">
+                        <button id="search-btn" class="btn btn-primary">
+                            <i class="fas fa-search"></i> Buscar
+                        </button>
+                    </div>
+
+                    <!-- Camera Scanner -->
+                    <div id="camera-scanner" class="camera-scanner hidden">
+                        <div id="qr-reader" class="qr-reader"></div>
+                        <div class="camera-controls">
+                            <button id="stop-camera" class="btn btn-danger">
+                                <i class="fas fa-stop"></i> Detener Cámara
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Scanner Results -->
+                    <div id="scanner-results" class="scanner-results hidden">
+                        <div class="result-card">
+                            <div class="result-header">
+                                <h3>Información del Boleto</h3>
+                                <span id="result-status" class="status-badge"></span>
+                            </div>
+                            <div class="result-content">
+                                <div class="result-info">
+                                    <div class="info-item">
+                                        <label>Código:</label>
+                                        <span id="result-codigo" class="code-display"></span>
+                                    </div>
+                                    <div class="info-item">
+                                        <label>Vueltas Restantes:</label>
+                                        <span id="result-vueltas" class="vueltas-display"></span>
+                                    </div>
+                                    <div class="info-item">
+                                        <label>Fecha de Creación:</label>
+                                        <span id="result-fecha"></span>
+                                    </div>
+                                </div>
+                                <div class="result-actions">
+                                    <button id="registrar-vuelta" class="btn btn-success">
+                                        <i class="fas fa-check"></i> Registrar Vuelta
+                                    </button>
+                                    <button id="ver-historial" class="btn btn-info">
+                                        <i class="fas fa-history"></i> Ver Historial
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Historial -->
+                        <div id="historial-section" class="historial-section hidden">
+                            <h4><i class="fas fa-clock"></i> Historial de Uso</h4>
+                            <div id="historial-list" class="historial-list"></div>
+                        </div>
+                    </div>
+
+                    <!-- Error Messages -->
+                    <div id="error-message" class="error-message hidden">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <span id="error-text"></span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Generator Section -->
+            <section class="generator-section card">
+                <div class="section-header">
+                    <h2><i class="fas fa-ticket-alt"></i> Generar Boletos</h2>
+                    <div class="admin-badge">
+                        <i class="fas fa-shield-alt"></i> Panel de Administrador
+                    </div>
+                </div>
+
+                <div class="generator-content">
+                    <div class="generator-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="cantidad-boletos">Cantidad de Boletos</label>
+                                <input type="number" id="cantidad-boletos" min="1" max="50" value="1" 
+                                       class="form-input">
+                                <small class="form-help">Máximo 50 boletos por generación</small>
+                            </div>
+                            <div class="form-group">
+                                <label for="vueltas-boleto">Vueltas por Boleto</label>
+                                <input type="number" id="vueltas-boleto" min="1" max="10" value="3" 
+                                       class="form-input">
+                                <small class="form-help">3 tacos por vuelta</small>
+                            </div>
+                        </div>
+                        <div class="form-actions">
+                            <button id="generar-boletos" class="btn btn-primary btn-large">
+                                <i class="fas fa-magic"></i> Generar Boletos
+                            </button>
+                            <button id="exportar-datos" class="btn btn-outline">
+                                <i class="fas fa-download"></i> Exportar Datos
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Generated Tickets Preview -->
+                    <div id="tickets-preview" class="tickets-preview hidden">
+                        <div class="preview-header">
+                            <h3><i class="fas fa-eye"></i> Vista Previa de Boletos</h3>
+                            <div class="preview-actions">
+                                <button id="download-pdf" class="btn btn-success">
+                                    <i class="fas fa-file-pdf"></i> Descargar PDF
+                                </button>
+                                <button id="print-tickets" class="btn btn-outline">
+                                    <i class="fas fa-print"></i> Imprimir
+                                </button>
+                            </div>
+                        </div>
+                        <div id="tickets-container" class="tickets-container"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Data Management Section -->
+            <section class="data-section card">
+                <div class="section-header">
+                    <h2><i class="fas fa-database"></i> Gestión de Datos</h2>
+                </div>
+                <div class="data-content">
+                    <div class="data-stats">
+                        <div class="stat-card">
+                            <i class="fas fa-ticket-alt"></i>
+                            <div class="stat-info">
+                                <span class="stat-value" id="total-generados">0</span>
+                                <span class="stat-label">Boletos Generados</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-check-circle"></i>
+                            <div class="stat-info">
+                                <span class="stat-value" id="total-usados">0</span>
+                                <span class="stat-label">Vueltas Usadas</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-clock"></i>
+                            <div class="stat-info">
+                                <span class="stat-value" id="ultimo-backup">--</span>
+                                <span class="stat-label">Último Backup</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="data-actions">
+                        <button id="backup-datos" class="btn btn-info">
+                            <i class="fas fa-save"></i> Crear Backup
+                        </button>
+                        <button id="importar-datos" class="btn btn-warning">
+                            <i class="fas fa-upload"></i> Importar Datos
+                        </button>
+                        <button id="limpiar-datos" class="btn btn-danger">
+                            <i class="fas fa-trash"></i> Limpiar Datos
+                        </button>
+                    </div>
+                    <input type="file" id="file-import" accept=".csv,.txt" class="hidden">
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 Control de Boletos - Carne Asada. Desarrollado con ❤️ para eventos exitosos.</p>
+        </div>
+    </footer>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay hidden">
+        <div class="loading-spinner">
+            <i class="fas fa-spinner fa-spin"></i>
+            <p>Procesando...</p>
+        </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- Scripts -->
+    <script src="lib/jsbarcode.min.js"></script>
+    <script src="lib/html5-qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="js/data-manager.js"></script>
+    <script src="js/barcode-scanner.js"></script>
+    <script src="js/ticket-generator.js"></script>
+    <script src="js/pdf-generator.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
+
